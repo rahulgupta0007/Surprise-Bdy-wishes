@@ -6,13 +6,13 @@ export const LIMITS = {
   herName: 48,
   hisName: 48,
   eyebrow: 80,
-  openingLine: 180,
-  letterLead: 900,
-  finaleLine: 400,
+  openingLine: 400,
+  letterLead: 20000,
+  finaleLine: 2000,
   passphrase: 60,
   noteTitle: 80,
-  noteBody: 4000,
-  caption: 240,
+  noteBody: 20000,
+  caption: 500,
 };
 
 export const PHOTO_TYPES: Record<string, string> = {

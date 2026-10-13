@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { mkdir, readFile, rename, unlink, writeFile } from "fs/promises";
+import { copyFile, mkdir, readFile, unlink, writeFile } from "fs/promises";
 import path from "path";
 import { LIMITS } from "./limits";
 import { SEED } from "./seed";
@@ -68,9 +68,18 @@ export async function readContent() {
 
 async function writeContent(content: Content) {
   await ensure();
-  const tmp = `${contentPath}.${process.pid}.tmp`;
-  await writeFile(tmp, JSON.stringify(content, null, 2));
-  await rename(tmp, contentPath);
+  const payload = JSON.stringify(content, null, 2);
+  const tmp = path.join(dataDir, `.content-${process.pid}.tmp`);
+  await writeFile(tmp, payload);
+  try {
+    await copyFile(tmp, contentPath);
+  } catch (error) {
+    await writeFile(contentPath, payload).catch(() => {
+      throw error;
+    });
+  } finally {
+    await unlink(tmp).catch(() => undefined);
+  }
 }
 
 function clip(value: unknown, max: number) {

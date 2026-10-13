@@ -386,7 +386,7 @@ export function Studio({ initial }: { initial: BackstageResponse }) {
           <a href="#films" className="hover:text-paper">Films</a>
         </nav>
 
-        {banner ? <p className="mt-6 text-sm text-gold">{banner}</p> : null}
+        {banner ? <p className={`mt-6 text-sm leading-6 ${/saved|Saving|Opening/i.test(banner) ? "text-gold" : "text-[#f0b7be]"}`}>{banner}</p> : null}
 
         <form id="names" onSubmit={(event) => void saveSettings(event)} className="desk-card mt-8">
           <div className="grid items-center gap-8 md:grid-cols-[9rem_1fr]">
@@ -458,10 +458,11 @@ export function Studio({ initial }: { initial: BackstageResponse }) {
               className="min-h-28"
               onChange={(event) => setSettings({ ...settings, letterLead: event.target.value })}
             />
-            {settingsDirty ? (
-              <Button type="button" className="mt-3 h-11 px-5" onClick={() => void saveSettings()}>
-                Save the night
-              </Button>
+            <Button type="button" className="mt-3 h-11 px-5" disabled={savingSettings} onClick={() => void saveSettings()}>
+              {savingSettings ? "Saving" : settingsDirty ? "Save the night" : "Saved"}
+            </Button>
+            {banner ? (
+              <p className={`text-sm leading-6 ${/saved|Saving|Opening/i.test(banner) ? "text-gold" : "text-[#f0b7be]"}`}>{banner}</p>
             ) : null}
           </div>
           <div className="mt-6 space-y-4">

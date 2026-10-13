@@ -94,11 +94,17 @@ export async function isGuest(request: NextRequest, passphrase: string) {
   return guestAllowed(request.cookies.get(GUEST_COOKIE)?.value, passphrase);
 }
 
+function requestIsHttps(request: NextRequest) {
+  const forwarded = request.headers.get("x-forwarded-proto");
+  if (forwarded) return forwarded.split(",")[0].trim() === "https";
+  return request.nextUrl.protocol === "https:";
+}
+
 function cookieBase(request: NextRequest, maxAge: number) {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: request.nextUrl.protocol === "https:",
+    secure: requestIsHttps(request),
     path: "/",
     maxAge,
   };
