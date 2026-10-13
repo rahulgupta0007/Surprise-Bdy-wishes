@@ -28,17 +28,26 @@ function asContent(data: Partial<Content>): Content {
   return { settings: data.settings, notes: data.notes, photos: data.photos, videos: data.videos };
 }
 
-export function Studio() {
-  const [phase, setPhase] = useState<"loading" | "gate" | "ready" | "error">("loading");
-  const [needsSetup, setNeedsSetup] = useState(false);
+export function Studio({ initial }: { initial: BackstageResponse }) {
+  const seeded = initial.authed ? initial : null;
+  const [phase, setPhase] = useState<"loading" | "gate" | "ready" | "error">(initial.authed ? "ready" : "gate");
+  const [needsSetup, setNeedsSetup] = useState(initial.needsSetup);
   const [loadError, setLoadError] = useState("");
-  const [settings, setSettings] = useState<Settings>(emptySettings);
-  const [savedSettings, setSavedSettings] = useState("");
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [photos, setPhotos] = useState<Media[]>([]);
-  const [videos, setVideos] = useState<Media[]>([]);
-  const [savedNotes, setSavedNotes] = useState<Record<string, string>>({});
-  const [savedCaptions, setSavedCaptions] = useState<Record<string, string>>({});
+  const [settings, setSettings] = useState<Settings>(seeded?.settings ?? emptySettings);
+  const [savedSettings, setSavedSettings] = useState(JSON.stringify(seeded?.settings ?? emptySettings));
+  const [notes, setNotes] = useState<Note[]>(seeded?.notes ?? []);
+  const [photos, setPhotos] = useState<Media[]>(seeded?.photos ?? []);
+  const [videos, setVideos] = useState<Media[]>(seeded?.videos ?? []);
+  const [savedNotes, setSavedNotes] = useState<Record<string, string>>(() => {
+    const keys: Record<string, string> = {};
+    for (const note of seeded?.notes ?? []) keys[note.id] = fingerprint(note);
+    return keys;
+  });
+  const [savedCaptions, setSavedCaptions] = useState<Record<string, string>>(() => {
+    const captions: Record<string, string> = {};
+    for (const item of [...(seeded?.photos ?? []), ...(seeded?.videos ?? [])]) captions[item.id] = item.caption;
+    return captions;
+  });
   const [banner, setBanner] = useState("");
   const [savingSettings, setSavingSettings] = useState(false);
   const [jobs, setJobs] = useState<UploadJob[]>([]);
@@ -75,11 +84,6 @@ export function Studio() {
       setPhase("error");
     }
   }, []);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0);
-    return () => window.clearTimeout(timer);
-  }, [load]);
 
   const settingsDirty = JSON.stringify(settings) !== savedSettings;
   const notesDirty = notes.some((note) => savedNotes[note.id] !== fingerprint(note));

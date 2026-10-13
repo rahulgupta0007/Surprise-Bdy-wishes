@@ -74,19 +74,24 @@ export async function guestToken(passphrase: string) {
   return sign(await readSecret(), `guest:${passphrase.trim().toLowerCase()}`);
 }
 
-export async function isAdmin(request: NextRequest) {
+export async function adminAllowed(cookie: string | undefined) {
   const auth = await readAuth();
-  if (!auth.passwordHash) return false;
-  const cookie = request.cookies.get(ADMIN_COOKIE)?.value;
-  if (!cookie) return false;
+  if (!auth.passwordHash || !cookie) return false;
   return safeEqual(cookie, await adminToken(auth.passwordHash));
 }
 
-export async function isGuest(request: NextRequest, passphrase: string) {
+export async function guestAllowed(cookie: string | undefined, passphrase: string) {
   if (!passphrase.trim()) return true;
-  const cookie = request.cookies.get(GUEST_COOKIE)?.value;
   if (!cookie) return false;
   return safeEqual(cookie, await guestToken(passphrase));
+}
+
+export async function isAdmin(request: NextRequest) {
+  return adminAllowed(request.cookies.get(ADMIN_COOKIE)?.value);
+}
+
+export async function isGuest(request: NextRequest, passphrase: string) {
+  return guestAllowed(request.cookies.get(GUEST_COOKIE)?.value, passphrase);
 }
 
 function cookieBase(request: NextRequest, maxAge: number) {

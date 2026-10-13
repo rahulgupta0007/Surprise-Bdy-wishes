@@ -21,81 +21,28 @@ function readOpened() {
   return window.sessionStorage.getItem(OPEN_KEY) === "1";
 }
 
-export function Experience() {
-  const [status, setStatus] = useState<"loading" | "error" | "locked" | "ready">("loading");
-  const [keepsake, setKeepsake] = useState<PublicKeepsake | null>(null);
-  const [lockedName, setLockedName] = useState("you");
-  const [error, setError] = useState("");
+export function Experience({ initial }: { initial: KeepsakeResponse }) {
+  const [keepsake, setKeepsake] = useState<PublicKeepsake | null>(initial.locked ? null : initial);
+  const [lockedName, setLockedName] = useState(initial.herName);
   const reduce = useReducedMotion();
-
-  async function load() {
-    setStatus("loading");
-    setError("");
-    try {
-      const data = await readJson<KeepsakeResponse>(await fetch("/api/keepsake", { cache: "no-store" }));
-      if (data.locked) {
-        setLockedName(data.herName);
-        setKeepsake(null);
-        setStatus("locked");
-        return;
-      }
-      setKeepsake(data);
-      setStatus("ready");
-      document.title = `For ${data.herName}`;
-    } catch (reason) {
-      setError(reason instanceof Error ? reason.message : "The page could not open.");
-      setStatus("error");
-    }
-  }
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => void load(), 0);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   return (
     <div className="night">
       <div className="vignette" />
       <div className="grain" />
       <div className="relative z-10">
-        {status === "loading" ? <Loading /> : null}
-        {status === "error" ? <Problem message={error} onRetry={() => void load()} /> : null}
-        {status === "locked" ? (
+        {keepsake ? (
+          <Story keepsake={keepsake} reduce={Boolean(reduce)} />
+        ) : (
           <WordGate
             herName={lockedName}
             onOpen={(data) => {
+              setLockedName(data.herName);
               setKeepsake(data);
-              setStatus("ready");
               document.title = `For ${data.herName}`;
             }}
           />
-        ) : null}
-        {status === "ready" && keepsake ? <Story keepsake={keepsake} reduce={Boolean(reduce)} /> : null}
-      </div>
-    </div>
-  );
-}
-
-function Loading() {
-  return (
-    <div className="stage">
-      <div className="text-center">
-        <WaxSeal letter="·" className="seal-idle mx-auto h-28 w-28" />
-        <p className="mt-8 font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">One moment</p>
-      </div>
-    </div>
-  );
-}
-
-function Problem({ message, onRetry }: { message: string; onRetry: () => void }) {
-  return (
-    <div className="stage">
-      <div className="mx-auto max-w-md text-center">
-        <p className="font-display text-4xl italic">The page caught its breath.</p>
-        <p className="mt-4 text-paper/70">{message}</p>
-        <Button type="button" className="mt-8 h-11 px-5" onClick={onRetry}>
-          Try again
-        </Button>
+        )}
       </div>
     </div>
   );
