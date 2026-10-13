@@ -14,12 +14,6 @@ export const SEED: Content = {
   },
   notes: [
     {
-      id: "seed-photographs",
-      title: "",
-      body: "The photographs and the films are further down. They are days I wanted to keep somewhere better than a camera roll.",
-      seed: true,
-    },
-    {
       id: "seed-morning",
       title: "",
       body: "If you are early, the last page will wait with you until the day begins. If you are right on time, then good morning.",
