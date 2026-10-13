@@ -309,7 +309,7 @@ export function Studio({ initial }: { initial: BackstageResponse }) {
   const checks = useMemo(
     () => [
       { label: "Her real name", done: settings.herName.trim() !== "" && settings.herName.trim().toLowerCase() !== "my love" },
-      { label: "Your name", done: settings.hisName.trim() !== "" && settings.hisName !== SEED.settings.hisName },
+      { label: "Your name", done: settings.hisName.trim() !== "" && settings.hisName.trim().toLowerCase() !== "yours" },
       {
         label: "Your words",
         done: notes.some((note) => note.body.trim() && !note.seed) || settings.letterLead !== SEED.settings.letterLead,
