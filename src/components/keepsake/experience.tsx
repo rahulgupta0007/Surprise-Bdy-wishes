@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { birthdayPhase, countdownParts, formatBirthday, formatBirthdayYear, pad } from "@/lib/format";
 import { readJson } from "@/lib/http";
 import type { KeepsakeResponse, PublicKeepsake, PublicMedia } from "@/lib/types";
-import { WaxSeal } from "./wax-seal";
+import { Candle } from "./candle";
+import { Flower, Petals } from "./petals";
 
-const OPEN_KEY = "keepsake-open";
+const OPEN_KEY = "keepsake-candle";
+const WHISPERS = ["ours", "this day", "stay", "you", "kept", "soft"];
 
 function subscribeOpen() {
   return () => undefined;
@@ -27,9 +29,8 @@ export function Experience({ initial }: { initial: KeepsakeResponse }) {
   const reduce = useReducedMotion();
 
   return (
-    <div className="night">
-      <div className="vignette" />
-      <div className="grain" />
+    <div className="garden">
+      <Petals />
       <div className="relative z-10">
         {keepsake ? (
           <Story keepsake={keepsake} reduce={Boolean(reduce)} />
@@ -76,11 +77,11 @@ function WordGate({ herName, onOpen }: { herName: string; onOpen: (data: PublicK
   return (
     <div className="stage">
       <form onSubmit={(event) => void submit(event)} className="w-full max-w-md text-center">
-        <p className="font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">Before the seal</p>
-        <h1 className="mt-6 font-display text-[clamp(3.2rem,10vw,5.4rem)] leading-none italic text-balance">
+        <p className="font-sans text-[0.72rem] tracking-[0.32em] text-rose uppercase">A word between us</p>
+        <h1 className="mt-6 font-display text-[clamp(3.2rem,10vw,5.4rem)] leading-none italic text-balance text-inkrose">
           {herName}
         </h1>
-        <p className="mx-auto mt-6 max-w-xs text-paper/75">There is a word only the two of you would say.</p>
+        <p className="mx-auto mt-6 max-w-xs text-inkrose/75">There is a word only the two of you would say.</p>
         <Label htmlFor="word" className="sr-only">
           The word
         </Label>
@@ -152,15 +153,15 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
     return () => observer.disconnect();
   }, [isOpen, chapterKey]);
 
-  function openSeal() {
+  function blowCandle() {
     if (leaving || isOpen) return;
-    playSealTone();
+    playWishTone();
     setLeaving(true);
     window.setTimeout(() => {
       window.sessionStorage.setItem(OPEN_KEY, "1");
       setOpened(true);
       window.scrollTo({ top: 0 });
-    }, reduce ? 0 : 780);
+    }, reduce ? 0 : 1100);
   }
 
   const phase = now === null ? null : birthdayPhase(keepsake.birthday, new Date(now));
@@ -177,26 +178,32 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
             animate={leaving ? { opacity: 0, y: reduce ? 0 : -28 } : { opacity: 1, y: 0 }}
             transition={{ duration: reduce ? 0.01 : 0.75, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="w-full max-w-3xl text-center">
-              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 font-sans text-[0.68rem] tracking-[0.16em] text-gold/75 uppercase sm:tracking-[0.28em]">
+            <div className="w-full max-w-3xl text-center text-inkrose">
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 font-sans text-[0.68rem] tracking-[0.16em] text-rose uppercase sm:tracking-[0.28em]">
                 <span>Only for you</span>
                 <span>
                   {formatBirthday(keepsake.birthday)} {formatBirthdayYear(keepsake.birthday)}
                 </span>
               </div>
-              <p className="mt-10 font-sans text-[0.74rem] tracking-[0.28em] text-gold/80 uppercase sm:mt-16 sm:tracking-[0.34em]">
-                {keepsake.eyebrow || "A birthday, kept quiet"}
+              <p className="mt-8 font-sans text-[0.74rem] tracking-[0.28em] text-rose uppercase sm:mt-12">
+                {keepsake.eyebrow || "A little birthday, kept soft"}
               </p>
-              <h1 className="mt-5 font-display text-[clamp(3.15rem,14vw,8.4rem)] leading-[0.9] font-light italic text-balance">
+              <h1 className="mt-4 font-display text-[clamp(3.15rem,14vw,8.4rem)] leading-[0.9] font-light italic text-balance">
                 {keepsake.herName}
               </h1>
-              <button type="button" className="seal-button mt-12" onClick={openSeal} aria-label="Break the seal">
-                <WaxSeal letter={keepsake.herName} className="seal-idle h-40 w-40 sm:h-48 sm:w-48" />
+              <p className="mx-auto mt-4 max-w-sm font-letter text-lg text-inkrose/80">
+                {phase === "today"
+                  ? "The morning is yours. Make a wish."
+                  : "I lit this before your morning. The day is almost here."}
+              </p>
+              <button type="button" className="candle-button mt-6" onClick={blowCandle} aria-label="Blow the candle and open your birthday">
+                <Candle blown={leaving} className="mx-auto h-56 w-36 sm:h-64 sm:w-40" />
               </button>
-              <p className="mt-6 font-sans text-[0.72rem] tracking-[0.28em] text-paper/70 uppercase">Press the seal</p>
-              {keepsake.openingLine ? (
-                <p className="mx-auto mt-8 max-w-sm font-letter text-lg text-paper/80">{keepsake.openingLine}</p>
-              ) : null}
+              <p className="font-sans text-[0.72rem] tracking-[0.28em] text-rose uppercase">
+                {phase === "today" ? "Make a wish" : "Blow the candle"}
+              </p>
+              {phase === "before" && parts ? <Countdown parts={parts} label="Until your day" /> : null}
+              {phase === "today" ? <p className="mt-8 font-letter text-xl text-rose">Today is yours, my love.</p> : null}
             </div>
           </motion.section>
         ) : null}
@@ -212,11 +219,13 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
           <h1 className="sr-only">A birthday for {keepsake.herName}</h1>
           {letterVisible ? (
             <section id="letter" className="chapter mx-auto w-full max-w-3xl px-4 pt-16 sm:px-6 sm:pt-24">
-              <p className="mb-6 text-center font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">
-                The letter
+              <p className="mb-6 flex items-center justify-center gap-3 text-center font-sans text-[0.72rem] tracking-[0.32em] text-rose uppercase">
+                <Flower className="h-5 w-5" />
+                A letter for you
+                <Flower className="h-5 w-5" />
               </p>
               <article className="paper">
-                <WaxSeal letter={keepsake.herName} className="mx-auto -mt-4 mb-8 h-28 w-28" />
+                <Flower className="mx-auto -mt-2 mb-6 h-12 w-12" />
                 <div className="letter-copy">
                   {keepsake.letterLead.trim() ? <p className="lead">{keepsake.letterLead}</p> : null}
                   {notes.map((note, index) => (
@@ -234,30 +243,29 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
 
           {keepsake.photos.length ? (
             <section id="pictures" className="chapter pt-24 sm:pt-32">
-              <div className="mx-auto mb-8 max-w-3xl px-6">
-                <p className="font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">The photographs</p>
-                <h2 className="mt-3 font-display text-5xl leading-none font-light italic sm:text-6xl">Held up to the light</h2>
-                <p className="mt-4 max-w-md text-paper/70">Slide across. Tap a frame when you want to look longer.</p>
+              <div className="mx-auto mb-8 max-w-3xl px-6 text-inkrose">
+                <p className="font-sans text-[0.72rem] tracking-[0.32em] text-rose uppercase">Pressed like flowers</p>
+                <h2 className="mt-3 font-display text-5xl leading-none font-light italic sm:text-6xl">The days I kept</h2>
+                <p className="mt-4 max-w-md font-letter text-lg text-inkrose/75">
+                  They open one after another, soft as petals. Tap any one when you want to stay with it.
+                </p>
               </div>
-              <Filmstrip photos={keepsake.photos} />
+              <Bouquet photos={keepsake.photos} reduce={reduce} />
             </section>
           ) : null}
 
           {keepsake.videos.length ? (
-            <section id="films" className="chapter mx-auto w-full max-w-3xl px-4 pt-24 sm:px-6 sm:pt-32">
-              <p className="font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">The films</p>
-              <h2 className="mt-3 font-display text-5xl leading-none font-light italic sm:text-6xl">A private screening</h2>
+            <section id="films" className="chapter mx-auto w-full max-w-3xl px-4 pt-24 text-inkrose sm:px-6 sm:pt-32">
+              <p className="font-sans text-[0.72rem] tracking-[0.32em] text-rose uppercase">Little films</p>
+              <h2 className="mt-3 font-display text-5xl leading-none font-light italic sm:text-6xl">The ones that move</h2>
+              <p className="mt-4 max-w-md font-letter text-lg text-inkrose/75">Moving memories, kept just as carefully.</p>
               <div className="mt-10 space-y-12">
                 {keepsake.videos.map((video, index) => (
-                  <figure key={video.id}>
-                    <div className="frame">
-                      <video className="aspect-video w-full bg-black" controls playsInline preload="metadata" src={video.src} />
-                    </div>
-                    <figcaption className="mt-4 flex gap-4 text-paper/75">
-                      <span className="font-sans text-[0.68rem] tracking-[0.22em] text-gold uppercase">
-                        {pad(index + 1)}
-                      </span>
-                      <span className="font-letter">{video.caption}</span>
+                  <figure key={video.id} className="rounded-[1.8rem] bg-white p-3 shadow-[0_22px_50px_rgba(200,90,130,0.16)]">
+                    <video className="aspect-video w-full rounded-[1.2rem] bg-[#3a1c28]" controls playsInline preload="metadata" src={video.src} />
+                    <figcaption className="flex items-start gap-3 px-3 py-4">
+                      <Flower className="mt-1 h-5 w-5 shrink-0" />
+                      <span className="font-letter text-lg">{video.caption || `Film ${pad(index + 1)}`}</span>
                     </figcaption>
                   </figure>
                 ))}
@@ -265,9 +273,14 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
             </section>
           ) : null}
 
-          <section id="day" className="chapter stage text-center">
+          <section id="day" className="chapter stage text-center text-inkrose">
             <div className="mx-auto w-full max-w-2xl">
-              <p className="font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">
+              <div className="mb-4 flex justify-center gap-3">
+                <Flower className="h-8 w-8" />
+                <Flower className="h-10 w-10" />
+                <Flower className="h-8 w-8" />
+              </div>
+              <p className="font-sans text-[0.72rem] tracking-[0.32em] text-rose uppercase">
                 {formatBirthday(keepsake.birthday)} {formatBirthdayYear(keepsake.birthday)}
               </p>
               <h2 className="mt-6 font-display text-[clamp(3.4rem,9vw,6.5rem)] leading-[0.9] font-light italic text-balance">
@@ -275,31 +288,17 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
                 <span className="block">{keepsake.herName}</span>
               </h2>
               {keepsake.finaleLine ? (
-                <p className="mx-auto mt-8 max-w-md font-letter text-xl text-paper/85">{keepsake.finaleLine}</p>
-              ) : null}
-              <p className="mt-6 font-letter text-paper/60">— {keepsake.hisName}</p>
-              {phase === "today" ? <p className="mt-10 font-letter text-xl text-gold">Today is yours.</p> : null}
-              {phase === "before" && parts ? (
-                <div className="mx-auto mt-12 max-w-lg">
-                  <p className="font-sans text-[0.68rem] tracking-[0.28em] text-gold/80 uppercase">Until the day begins</p>
-                  <div className="mt-4 grid grid-cols-4 gap-2 sm:gap-3">
-                    {[
-                      ["Days", parts.days],
-                      ["Hours", parts.hours],
-                      ["Minutes", parts.minutes],
-                      ["Seconds", parts.seconds],
-                    ].map(([label, value]) => (
-                      <div key={String(label)} className="border border-gold/25 px-1 py-4">
-                        <div className="font-display text-3xl italic sm:text-4xl">{pad(Number(value))}</div>
-                        <div className="mt-2 font-sans text-[0.6rem] tracking-[0.16em] text-gold/75 uppercase sm:text-[0.65rem]">
-                          {label}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-              {phase === "after" ? <p className="mt-10 text-paper/60">Still yours, whenever you open this.</p> : null}
+                <p className="mx-auto mt-8 max-w-md font-letter text-xl text-inkrose/85">{keepsake.finaleLine}</p>
+              ) : (
+                <p className="mx-auto mt-8 max-w-md font-letter text-xl text-inkrose/85">
+                  You are my favourite kind of soft, and today the flowers know your name.
+                </p>
+              )}
+              <p className="mt-6 font-letter text-rose">— {keepsake.hisName}</p>
+              <Candle className="mx-auto mt-8 h-40 w-24" />
+              {phase === "today" ? <p className="mt-4 font-letter text-xl text-rose">Today is yours, completely.</p> : null}
+              {phase === "before" && parts ? <Countdown parts={parts} label="Still a little while" /> : null}
+              {phase === "after" ? <p className="mt-8 font-letter text-inkrose/70">The flowers stay, whenever you come back.</p> : null}
             </div>
           </section>
         </motion.div>
@@ -307,13 +306,13 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
 
       {isOpen && chapters.length > 1 ? (
         <nav className="fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[max(0.8rem,env(safe-area-inset-bottom))]">
-          <div className="flex max-w-full gap-1 overflow-x-auto rounded-full border border-gold/20 bg-black/50 p-1.5 backdrop-blur-md">
+          <div className="flex max-w-full gap-1 overflow-x-auto rounded-full border border-petal bg-white/80 p-1.5 shadow-[0_10px_30px_rgba(200,90,130,0.16)] backdrop-blur-md">
             {chapters.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 className={`rounded-full px-3 py-2 font-sans text-[0.68rem] tracking-[0.16em] uppercase transition-colors ${
-                  chapter === item.id ? "bg-gold text-ink" : "text-paper/80 hover:text-paper"
+                  chapter === item.id ? "bg-rose text-white" : "text-inkrose/80 hover:text-inkrose"
                 }`}
                 onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" })}
               >
@@ -327,114 +326,111 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
   );
 }
 
-function Filmstrip({ photos }: { photos: PublicMedia[] }) {
-  const scroller = useRef<HTMLDivElement>(null);
-  const drag = useRef({ active: false, moved: false, x: 0, left: 0 });
-  const [active, setActive] = useState(0);
+function Countdown({
+  parts,
+  label,
+}: {
+  parts: { days: number; hours: number; minutes: number; seconds: number };
+  label: string;
+}) {
+  return (
+    <div className="mx-auto mt-8 max-w-lg">
+      <p className="font-sans text-[0.68rem] tracking-[0.28em] text-rose uppercase">{label}</p>
+      <div className="mt-4 grid grid-cols-4 gap-2 sm:gap-3">
+        {[
+          ["Days", parts.days],
+          ["Hours", parts.hours],
+          ["Minutes", parts.minutes],
+          ["Seconds", parts.seconds],
+        ].map(([name, value]) => (
+          <div key={String(name)} className="rounded-2xl bg-white/80 px-1 py-4 shadow-[0_10px_24px_rgba(200,90,130,0.12)]">
+            <div className="font-display text-3xl text-rose italic sm:text-4xl">{pad(Number(value))}</div>
+            <div className="mt-2 font-sans text-[0.6rem] tracking-[0.16em] text-inkrose/60 uppercase sm:text-[0.65rem]">{name}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Bouquet({ photos, reduce }: { photos: PublicMedia[]; reduce: boolean }) {
+  const [index, setIndex] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
+  const [paused, setPaused] = useState(false);
+  const touch = useRef(0);
+  const photo = photos[index];
 
-  function measure() {
-    const el = scroller.current;
-    if (!el) return;
-    const center = el.getBoundingClientRect().left + el.clientWidth / 2;
-    const frames = [...el.querySelectorAll<HTMLElement>("[data-frame]")];
-    let best = 0;
-    let bestDist = Number.POSITIVE_INFINITY;
-    frames.forEach((frame, index) => {
-      const rect = frame.getBoundingClientRect();
-      const dist = Math.abs(rect.left + rect.width / 2 - center);
-      if (dist < bestDist) {
-        best = index;
-        bestDist = dist;
-      }
-    });
-    setActive(best);
-  }
+  useEffect(() => {
+    if (reduce || paused || photos.length < 2) return;
+    const timer = window.setInterval(() => setIndex((current) => (current + 1) % photos.length), 4600);
+    return () => window.clearInterval(timer);
+  }, [photos.length, paused, reduce]);
 
-  function scrollByFrame(direction: -1 | 1) {
-    const el = scroller.current;
-    const frame = el?.querySelector<HTMLElement>("[data-frame]");
-    if (!el || !frame) return;
-    el.scrollBy({ left: direction * (frame.offsetWidth + 16), behavior: "smooth" });
-  }
-
-  const photo = photos[active];
+  if (!photo) return null;
 
   return (
     <div>
-      <div className="relative">
-        <div
-          ref={scroller}
-          className="film"
-          onScroll={measure}
-          onPointerDown={(event) => {
-            if (event.pointerType === "touch" || !scroller.current) return;
-            drag.current = { active: true, moved: false, x: event.clientX, left: scroller.current.scrollLeft };
-            scroller.current.setPointerCapture(event.pointerId);
-          }}
-          onPointerMove={(event) => {
-            if (!drag.current.active || !scroller.current) return;
-            const delta = event.clientX - drag.current.x;
-            if (Math.abs(delta) > 4) drag.current.moved = true;
-            scroller.current.scrollLeft = drag.current.left - delta;
-          }}
-          onPointerUp={() => {
-            drag.current.active = false;
-          }}
-        >
-          {photos.map((item, index) => (
-            <figure key={item.id} data-frame className="film-frame">
-              <button
-                type="button"
-                className="block w-full"
-                onClick={() => {
-                  if (drag.current.moved) {
-                    drag.current.moved = false;
-                    return;
-                  }
-                  setOpen(index);
-                }}
-                aria-label={item.caption || `Open photograph ${index + 1}`}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={item.src} alt={item.caption || `Photograph ${index + 1}`} draggable={false} />
-              </button>
-            </figure>
-          ))}
-        </div>
+      <div
+        className="mx-auto max-w-3xl px-4"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onTouchStart={(event) => {
+          touch.current = event.changedTouches[0]?.clientX ?? 0;
+        }}
+        onTouchEnd={(event) => {
+          const delta = (event.changedTouches[0]?.clientX ?? 0) - touch.current;
+          if (delta > 48) setIndex((index - 1 + photos.length) % photos.length);
+          if (delta < -48) setIndex((index + 1) % photos.length);
+        }}
+      >
+        <button type="button" className="memory-stage" onClick={() => setOpen(index)} aria-label={photo.caption || "Open this photograph"}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={photo.id}
+              className="overflow-hidden rounded-[1.2rem]"
+              initial={reduce ? false : { opacity: 0, scale: 1.04 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={reduce ? undefined : { opacity: 0 }}
+              transition={{ duration: reduce ? 0.01 : 0.85, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="memory-photo" src={photo.src} alt={photo.caption || `Photograph ${index + 1}`} />
+            </motion.div>
+          </AnimatePresence>
+          <span className="memory-caption">{photo.caption || "A day I kept for you"}</span>
+        </button>
         {photos.length > 1 ? (
-          <>
-            <button type="button" className="film-nav left-3" onClick={() => scrollByFrame(-1)} aria-label="Previous photograph">
-              ‹
-            </button>
-            <button type="button" className="film-nav right-3" onClick={() => scrollByFrame(1)} aria-label="Next photograph">
-              ›
-            </button>
-          </>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            {photos.map((item, itemIndex) => (
+              <button
+                key={item.id}
+                type="button"
+                className={itemIndex === index ? "blossom-dot on" : "blossom-dot"}
+                onClick={() => setIndex(itemIndex)}
+                aria-label={`Show photograph ${itemIndex + 1}`}
+              />
+            ))}
+          </div>
         ) : null}
       </div>
-      <div className="mx-auto mt-6 flex max-w-3xl items-baseline gap-4 px-6">
-        <span className="font-sans text-[0.72rem] tracking-[0.22em] text-gold uppercase">
-          {pad(active + 1)} / {pad(photos.length)}
-        </span>
-        <AnimatePresence mode="wait">
-          <motion.p
-            key={photo?.id ?? "empty"}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.25 }}
-            className="font-letter text-lg text-paper/85"
+      <div className="mx-auto mt-12 grid max-w-5xl grid-cols-2 gap-x-4 gap-y-8 px-4 sm:grid-cols-3 sm:gap-x-6">
+        {photos.map((item, itemIndex) => (
+          <motion.button
+            key={item.id}
+            type="button"
+            className="polaroid"
+            style={{ rotate: `${[-2.5, 2, -1, 2.5, -1.5, 1.2][itemIndex % 6]}deg` }}
+            initial={reduce ? false : { opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: reduce ? 0.01 : 0.55, delay: reduce ? 0 : (itemIndex % 3) * 0.08 }}
+            onClick={() => setOpen(itemIndex)}
           >
-            {photo?.caption || " "}
-          </motion.p>
-        </AnimatePresence>
-      </div>
-      <div className="mx-auto mt-5 h-px max-w-3xl bg-white/10">
-        <div
-          className="h-px bg-gold transition-[width] duration-300"
-          style={{ width: `${photos.length <= 1 ? 100 : (active / (photos.length - 1)) * 100}%` }}
-        />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={item.src} alt={item.caption || `Photograph ${itemIndex + 1}`} />
+            <span>{item.caption || WHISPERS[itemIndex % WHISPERS.length]}</span>
+          </motion.button>
+        ))}
       </div>
       {open !== null ? <Lightbox photos={photos} index={open} onIndex={setOpen} onClose={() => setOpen(null)} /> : null}
     </div>
@@ -481,7 +477,7 @@ function Lightbox({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 grid grid-rows-[auto_1fr_auto] bg-black/92 text-paper"
+      className="fixed inset-0 z-50 grid grid-rows-[auto_1fr_auto] bg-[#fff7fa]/95 text-inkrose"
       role="dialog"
       aria-modal="true"
       aria-label={photo.caption || "Photograph"}
@@ -495,10 +491,10 @@ function Lightbox({
       }}
     >
       <div className="flex items-center justify-between px-4 py-4 sm:px-6">
-        <span className="font-sans text-[0.72rem] tracking-[0.22em] text-gold uppercase">
+        <span className="font-sans text-[0.72rem] tracking-[0.22em] text-rose uppercase">
           {pad(index + 1)} / {pad(photos.length)}
         </span>
-        <button ref={closeRef} type="button" className="font-sans text-sm tracking-[0.18em] uppercase" onClick={onClose}>
+        <button ref={closeRef} type="button" className="font-sans text-sm tracking-[0.18em] text-rose uppercase" onClick={onClose}>
           Close
         </button>
       </div>
@@ -530,13 +526,13 @@ function Lightbox({
           </button>
         ) : null}
       </div>
-      <p className="px-6 py-6 text-center font-letter text-lg text-paper/85">{photo.caption}</p>
+      <p className="px-6 py-6 text-center font-letter text-lg text-inkrose/85">{photo.caption}</p>
     </div>,
     document.body,
   );
 }
 
-function playSealTone() {
+function playWishTone() {
   const Context = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!Context) return;
   const ctx = new Context();

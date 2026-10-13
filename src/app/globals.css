@@ -17,6 +17,9 @@
   --color-paper: #f4efe6;
   --color-ink: #2a1810;
   --color-night: #12090d;
+  --color-rose: #c84b73;
+  --color-inkrose: #5a2a3a;
+  --color-petal: #ffd0e0;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -364,8 +367,221 @@
   }
 }
 
+.garden {
+  min-height: 100dvh;
+  background:
+    radial-gradient(720px 420px at 12% -10%, rgba(255, 182, 206, 0.85), transparent 60%),
+    radial-gradient(640px 480px at 100% 8%, rgba(255, 214, 228, 0.9), transparent 55%),
+    radial-gradient(520px 420px at 50% 100%, rgba(255, 228, 236, 0.8), transparent 50%),
+    #fff7fa;
+  color: #5a2a3a;
+}
+
+.petals {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+}
+
+.petal {
+  position: absolute;
+  top: -8vh;
+  border-radius: 70% 20% 70% 20%;
+  background: linear-gradient(135deg, #fff, #ffb7cf);
+  opacity: 0.85;
+  animation: petal-fall linear infinite;
+}
+
+@keyframes petal-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate3d(var(--drift), 110vh, 0) rotate(220deg);
+    opacity: 0;
+  }
+}
+
+.candle {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+}
+
+.candle-svg {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+}
+
+.candle-glow {
+  position: absolute;
+  top: 8%;
+  height: 34%;
+  width: 70%;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(255, 196, 92, 0.85), transparent 68%);
+  filter: blur(6px);
+  animation: glow 1.6s ease-in-out infinite;
+}
+
+.flame {
+  transform-origin: 80px 78px;
+  animation: flicker 1.15s ease-in-out infinite;
+}
+
+.candle-blown .flame,
+.candle-blown .candle-glow {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.candle-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.candle-button:focus-visible {
+  outline: 2px solid #c84b73;
+  outline-offset: 8px;
+  border-radius: 999px;
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    transform: scale(1) rotate(-2deg);
+  }
+  40% {
+    transform: scale(1.06, 0.94) rotate(2deg);
+  }
+  70% {
+    transform: scale(0.96, 1.05) rotate(-1deg);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+.memory-stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 1.8rem;
+  background: #fff;
+  padding: 0.7rem;
+  box-shadow: 0 24px 60px rgba(200, 90, 130, 0.18);
+}
+
+.memory-photo {
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  border-radius: 1.2rem;
+  object-fit: cover;
+}
+
+.memory-caption {
+  position: absolute;
+  right: 1.3rem;
+  bottom: 1.3rem;
+  left: 1.3rem;
+  border-radius: 999px;
+  background: rgba(255, 247, 250, 0.88);
+  padding: 0.7rem 1rem;
+  font-family: var(--font-literata), Georgia, serif;
+  color: #5a2a3a;
+}
+
+.blossom-dot {
+  height: 0.7rem;
+  width: 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: #ffd0e0;
+}
+
+.blossom-dot.on {
+  width: 1.4rem;
+  background: #c84b73;
+}
+
+.polaroid {
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  background: #fff;
+  padding: 0.55rem 0.55rem 0.85rem;
+  text-align: left;
+  box-shadow: 0 16px 36px rgba(200, 90, 130, 0.16);
+  cursor: pointer;
+}
+
+.polaroid img {
+  aspect-ratio: 1;
+  width: 100%;
+  object-fit: cover;
+}
+
+.polaroid span {
+  margin-top: 0.55rem;
+  overflow: hidden;
+  font-family: var(--font-literata), Georgia, serif;
+  font-size: 0.95rem;
+  color: #5a2a3a;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.garden .paper {
+  border-radius: 1.8rem;
+  background:
+    radial-gradient(120px 80px at 0 0, rgba(255, 208, 224, 0.7), transparent 70%),
+    radial-gradient(120px 80px at 100% 0, rgba(255, 208, 224, 0.55), transparent 70%),
+    #fff;
+  color: #5a2a3a;
+  box-shadow: 0 24px 60px rgba(200, 90, 130, 0.14);
+}
+
+.garden .letter-copy p.lead::first-letter,
+.garden .letter-copy .drop::first-letter,
+.garden .note-title {
+  color: #c84b73;
+}
+
+.garden .ornament::before {
+  border-color: #f4a7c0;
+}
+
+.garden .signature {
+  color: #c84b73;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .seal-idle {
+  .seal-idle,
+  .petal,
+  .flame,
+  .candle-glow {
     animation: none;
   }
   html {
