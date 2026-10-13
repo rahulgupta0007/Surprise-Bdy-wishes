@@ -1,0 +1,28 @@
+{
+  "settings": {
+    "herName": "My love",
+    "hisName": "Yours",
+    "eyebrow": "A birthday, kept quiet",
+    "openingLine": "Press the seal when you are ready.",
+    "letterLead": "I made this so you would have a place that is only yours. Not a chat, and not a story that disappears. A thing you can open.",
+    "finaleLine": "Happy birthday. I am glad the day is yours.",
+    "birthday": "2026-10-14",
+    "passphrase": ""
+  },
+  "notes": [
+    {
+      "id": "seed-photographs",
+      "title": "",
+      "body": "The photographs and the films are further down. They are days I wanted to keep somewhere better than a camera roll.",
+      "seed": true
+    },
+    {
+      "id": "seed-morning",
+      "title": "",
+      "body": "If you are early, the last page will wait with you until the day begins. If you are right on time, then good morning.",
+      "seed": true
+    }
+  ],
+  "photos": [],
+  "videos": []
+}
