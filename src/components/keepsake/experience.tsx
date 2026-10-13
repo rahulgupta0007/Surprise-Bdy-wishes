@@ -78,7 +78,7 @@ export function Experience() {
 
 function Loading() {
   return (
-    <div className="grid min-h-dvh place-items-center px-6">
+    <div className="stage">
       <div className="text-center">
         <WaxSeal letter="·" className="seal-idle mx-auto h-28 w-28" />
         <p className="mt-8 font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">One moment</p>
@@ -89,8 +89,8 @@ function Loading() {
 
 function Problem({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="grid min-h-dvh place-items-center px-6">
-      <div className="max-w-md text-center">
+    <div className="stage">
+      <div className="mx-auto max-w-md text-center">
         <p className="font-display text-4xl italic">The page caught its breath.</p>
         <p className="mt-4 text-paper/70">{message}</p>
         <Button type="button" className="mt-8 h-11 px-5" onClick={onRetry}>
@@ -127,7 +127,7 @@ function WordGate({ herName, onOpen }: { herName: string; onOpen: (data: PublicK
   }
 
   return (
-    <div className="grid min-h-dvh place-items-center px-6 py-16">
+    <div className="stage">
       <form onSubmit={(event) => void submit(event)} className="w-full max-w-md text-center">
         <p className="font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">Before the seal</p>
         <h1 className="mt-6 font-display text-[clamp(3.2rem,10vw,5.4rem)] leading-none italic text-balance">
@@ -232,22 +232,22 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
         {!isOpen ? (
           <motion.section
             key="seal"
-            className="grid min-h-dvh place-items-center px-6 py-16"
+            className="stage"
             initial={false}
             animate={leaving ? { opacity: 0, y: reduce ? 0 : -28 } : { opacity: 1, y: 0 }}
             transition={{ duration: reduce ? 0.01 : 0.75, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="w-full max-w-3xl text-center">
-              <div className="flex items-center justify-between font-sans text-[0.68rem] tracking-[0.28em] text-gold/75 uppercase">
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 font-sans text-[0.68rem] tracking-[0.16em] text-gold/75 uppercase sm:tracking-[0.28em]">
                 <span>Only for you</span>
                 <span>
                   {formatBirthday(keepsake.birthday)} {formatBirthdayYear(keepsake.birthday)}
                 </span>
               </div>
-              <p className="mt-16 font-sans text-[0.74rem] tracking-[0.34em] text-gold/80 uppercase">
+              <p className="mt-10 font-sans text-[0.74rem] tracking-[0.28em] text-gold/80 uppercase sm:mt-16 sm:tracking-[0.34em]">
                 {keepsake.eyebrow || "A birthday, kept quiet"}
               </p>
-              <h1 className="mt-5 font-display text-[clamp(4rem,13vw,8.4rem)] leading-[0.86] font-light italic text-balance">
+              <h1 className="mt-5 font-display text-[clamp(3.15rem,14vw,8.4rem)] leading-[0.9] font-light italic text-balance">
                 {keepsake.herName}
               </h1>
               <button type="button" className="seal-button mt-12" onClick={openSeal} aria-label="Break the seal">
@@ -325,8 +325,8 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
             </section>
           ) : null}
 
-          <section id="day" className="chapter grid min-h-dvh place-items-center px-6 py-24 text-center">
-            <div className="w-full max-w-2xl">
+          <section id="day" className="chapter stage text-center">
+            <div className="mx-auto w-full max-w-2xl">
               <p className="font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">
                 {formatBirthday(keepsake.birthday)} {formatBirthdayYear(keepsake.birthday)}
               </p>

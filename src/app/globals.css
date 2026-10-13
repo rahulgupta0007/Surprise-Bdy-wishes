@@ -183,6 +183,15 @@
   animation: seal-float 5.6s ease-in-out infinite;
 }
 
+.stage {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  padding: 2.5rem 1.5rem;
+}
+
 .chapter {
   scroll-margin-top: 1.5rem;
   scroll-margin-bottom: 6rem;
