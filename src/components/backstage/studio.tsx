@@ -308,7 +308,7 @@ export function Studio({ initial }: { initial: BackstageResponse }) {
 
   const checks = useMemo(
     () => [
-      { label: "Her real name", done: settings.herName.trim() !== "" && settings.herName !== SEED.settings.herName },
+      { label: "Her real name", done: settings.herName.trim() !== "" && settings.herName.trim().toLowerCase() !== "my love" },
       { label: "Your name", done: settings.hisName.trim() !== "" && settings.hisName !== SEED.settings.hisName },
       {
         label: "Your words",
@@ -394,7 +394,7 @@ export function Studio({ initial }: { initial: BackstageResponse }) {
             <div>
               <h2 className="font-display text-4xl font-light italic">Names and the day</h2>
               <p className="mt-2 text-sm leading-6 text-paper/70">
-                The seal carries the first letter of her name. The date decides whether she sees a countdown or the morning itself.
+                The seal reads My Ishika. The date decides whether she sees a countdown or the morning itself.
               </p>
             </div>
           </div>

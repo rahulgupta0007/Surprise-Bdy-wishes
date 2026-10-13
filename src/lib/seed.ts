@@ -2,7 +2,7 @@ import type { Content } from "./types";
 
 export const SEED: Content = {
   settings: {
-    herName: "My love",
+    herName: "Ishika",
     hisName: "Yours",
     eyebrow: "A birthday, kept quiet",
     openingLine: "Press the seal when you are ready.",

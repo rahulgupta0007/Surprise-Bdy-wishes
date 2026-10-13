@@ -1,9 +1,14 @@
 import { useId } from "react";
 import { cn } from "cn";
 
+function sealName(letter: string) {
+  const given = letter.trim().replace(/^my\s+/i, "").trim();
+  return given || "Ishika";
+}
+
 export function WaxSeal({ letter, className }: { letter: string; className?: string }) {
   const gradientId = `wax-${useId().replace(/:/g, "")}`;
-  const mark = (letter.trim().charAt(0) || "·").toLocaleUpperCase();
+  const name = sealName(letter);
 
   return (
     <span className={cn("seal-wrap relative inline-grid place-items-center", className)}>
@@ -31,8 +36,9 @@ export function WaxSeal({ letter, className }: { letter: string; className?: str
         />
         <ellipse cx="72" cy="60" rx="32" ry="16" fill="white" opacity="0.16" transform="rotate(-28 72 60)" />
       </svg>
-      <span className="seal-mark pointer-events-none col-start-1 row-start-1 font-display italic leading-none text-[#f6e7c4]">
-        {mark}
+      <span className="seal-mark pointer-events-none col-start-1 row-start-1 font-display italic text-[#f6e7c4]">
+        <span className="seal-kicker">My</span>
+        <span className="seal-name">{name}</span>
       </span>
     </span>
   );

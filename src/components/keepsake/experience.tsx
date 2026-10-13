@@ -163,13 +163,6 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
     }, reduce ? 0 : 780);
   }
 
-  function closeSeal() {
-    window.sessionStorage.removeItem(OPEN_KEY);
-    setOpened(false);
-    setLeaving(false);
-    window.scrollTo({ top: 0 });
-  }
-
   const phase = now === null ? null : birthdayPhase(keepsake.birthday, new Date(now));
   const parts = now === null ? null : countdownParts(keepsake.birthday, new Date(now));
 
@@ -223,7 +216,7 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
                 The letter
               </p>
               <article className="paper">
-                <WaxSeal letter={keepsake.herName} className="mx-auto -mt-2 mb-8 h-16 w-16" />
+                <WaxSeal letter={keepsake.herName} className="mx-auto -mt-4 mb-8 h-28 w-28" />
                 <div className="letter-copy">
                   {keepsake.letterLead.trim() ? <p className="lead">{keepsake.letterLead}</p> : null}
                   {notes.map((note, index) => (
@@ -307,9 +300,6 @@ function Story({ keepsake, reduce }: { keepsake: PublicKeepsake; reduce: boolean
                 </div>
               ) : null}
               {phase === "after" ? <p className="mt-10 text-paper/60">Still yours, whenever you open this.</p> : null}
-              <Button type="button" variant="outline" className="mt-12 h-11 border-gold/40 px-5 text-paper" onClick={closeSeal}>
-                Close it, and open it again
-              </Button>
             </div>
           </section>
         </motion.div>
