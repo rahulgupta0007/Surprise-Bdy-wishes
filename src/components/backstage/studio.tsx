@@ -30,7 +30,7 @@ function asContent(data: Partial<Content>): Content {
 
 export function Studio({ initial }: { initial: BackstageResponse }) {
   const seeded = initial.authed ? initial : null;
-  const [phase, setPhase] = useState<"loading" | "gate" | "ready" | "error">(initial.authed ? "ready" : "gate");
+  const [phase, setPhase] = useState<"gate" | "ready" | "error">(initial.authed ? "ready" : "gate");
   const [needsSetup, setNeedsSetup] = useState(initial.needsSetup);
   const [loadError, setLoadError] = useState("");
   const [settings, setSettings] = useState<Settings>(seeded?.settings ?? emptySettings);
@@ -69,16 +69,18 @@ export function Studio({ initial }: { initial: BackstageResponse }) {
   }
 
   const load = useCallback(async () => {
-    setPhase("loading");
+    setBanner("Opening…");
     try {
       const data = await readJson<BackstageResponse>(await fetch("/api/backstage", { cache: "no-store" }));
       if (!data.authed) {
         setNeedsSetup(data.needsSetup);
         setPhase("gate");
+        setBanner("");
         return;
       }
       adopt(data);
       setPhase("ready");
+      setBanner("");
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : "Backstage could not open.");
       setPhase("error");
@@ -316,14 +318,6 @@ export function Studio({ initial }: { initial: BackstageResponse }) {
     ],
     [notes, photos.length, settings.herName, settings.hisName, settings.letterLead],
   );
-
-  if (phase === "loading") {
-    return (
-      <div className="night grid min-h-dvh place-items-center">
-        <p className="font-sans text-[0.72rem] tracking-[0.32em] text-gold/80 uppercase">Opening backstage</p>
-      </div>
-    );
-  }
 
   if (phase === "error") {
     return (

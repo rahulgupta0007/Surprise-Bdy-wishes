@@ -116,11 +116,23 @@ export function setGuestCookie(response: NextResponse, request: NextRequest, tok
   response.cookies.set(GUEST_COOKIE, token, cookieBase(request, 60 * 60 * 24 * 14));
 }
 
+function hostname(host: string) {
+  return host.replace(/^\[|\]$/g, "").split(":")[0];
+}
+
+function isLocalHost(host: string) {
+  const name = hostname(host);
+  return name === "localhost" || name === "127.0.0.1" || name === "::1";
+}
+
 export function sameOrigin(request: NextRequest) {
   const origin = request.headers.get("origin");
   if (!origin) return true;
   try {
-    return new URL(origin).host === request.headers.get("host");
+    const originHost = new URL(origin).host;
+    const host = request.headers.get("host") ?? "";
+    if (originHost === host) return true;
+    return isLocalHost(originHost) && isLocalHost(host);
   } catch {
     return false;
   }

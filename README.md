@@ -10,10 +10,13 @@ Backstage is yours, at `/admin`. You choose a key the first time you open it. Fr
 
 ```bash
 npm install
-npm run dev
+npm run build
+npm start
 ```
 
 Open [http://127.0.0.1:4721](http://127.0.0.1:4721) for her page, and [http://127.0.0.1:4721/admin](http://127.0.0.1:4721/admin) for backstage.
+
+Use `npm start` after `npm run build`. The dev server (`npm run dev`) can paint the page and then ignore every click, because it blocks its own scripts when the browser uses `127.0.0.1`. If a tab still says "One moment" or "Opening backstage", close it and open the address again.
 
 Before you send her the link:
 
